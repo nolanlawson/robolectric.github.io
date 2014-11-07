@@ -1,0 +1,101 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Robolectric</title>
+    <script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(["_setAccount", "UA-19269905-1"]);
+  _gaq.push(["_trackPageview"]);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? '//ssl' : '//www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+    <link href="../images/favicon-6cf12dec.png" rel="icon" type="image/png" />
+    <link href="../stylesheets/application-5b0d8697.css" media="screen" rel="stylesheet" type="text/css" />
+    <script src="../javascripts/application-da39a3ee.js" type="text/javascript"></script>
+</head>
+
+<body>
+    <div id="wrapper">
+        <div id="header">
+            <ul class="nav navbar-nav pull-right">
+    <li>
+        <a href='http://robolectric.blogspot.com'>
+            <i class='glyphicon glyphicon-book'></i>
+            <span>Blog</span>
+        </a>
+    </li>
+    <li>
+        <a href='http://groups.google.com/group/robolectric'>
+            <i class='glyphicon glyphicon-envelope'></i>
+            <span>Mailing List</span>
+        </a>
+    </li>
+    <li>
+        <a href='/javadoc/index.html?overview-summary.html'>
+            <i class='glyphicon glyphicon-cog'></i>
+            <span>API Docs</span>
+        </a>
+    </li>
+</ul>
+        </div>
+
+        <div id="sidebar">
+            <a href="/"><img class="logo" src="../images/robolectric-7fb6698b.png" /></a><ul class='nav nav-stacked'><li class='nav-header'>Setup</li><li class='nav-item'><a href='/installation/'>Installation</a></li><li class='nav-item'><a href='/quick-start/'>Quick Start</a></li><li class='nav-item'><a href='/eclipse-quick-start/'>Eclipse Quick Start</a></li><li class='nav-item'><a href='/download/'>Downloads</a></li></ul><ul class='nav nav-stacked'><li class='nav-header'>User Guide</li><li class='nav-item'><a href='/getting-started/'>Getting Started</a></li><li class='nav-item'><a href='/configuring/'>Configuring Robolectric</a></li><li class='nav-item'><a href='/starting-components/'>Starting Other Components</a></li><li class='nav-item'><a href='/custom-shadows/'>Creating Custom Shadows</a></li><li class='nav-item'><a href='/activity-lifecycle/'>Driving the Activity Lifecycle</a></li><li class='nav-item'><a href='/resource-qualifiers/'>Using Qualified Resources</a></li></ul><ul class='nav nav-stacked'><li class='nav-header'>Customizing</li><li class='nav-item'><a href='/extending/'>Extending Robolectric</a></li><li class='nav-item'><a href='/custom-test-runner/'>Custom the Test Runner</a></li><li class='nav-item'><a href='/roboguice/'>Integrating with RoboGuice</a></li></ul><ul class='nav nav-stacked'><li class='nav-header'>Contributing</li><li class='nav-item'><a href='/contributor-guidelines/'>Contributor Guidelines</a></li><li class='nav-item'><a href='/release-notes/'>Release Notes</a></li><li class='nav-item'><a href='/android-jars/'>Real Android JARs</a></li><li class='nav-item'><a href='/resources/'>Other Resources</a></li></ul>
+        </div>
+
+        <div id="content">
+            <h1>Configuring Robolectric</h1>
+
+<p>There are numerous ways to configure certain behaviors of Robolectric at runtime.</p>
+
+<h2>System Properties</h2>
+
+<p>You can configure some global behaviors of Robolectric by setting these system properties:</p>
+
+<ul>
+<li><strong>robolectric.strictI18n</strong> - set to &ldquo;true&rdquo; to enable i18n-strict mode</li>
+<li><strong>robolectric.logging</strong> - may be &ldquo;stdout&rdquo;, &ldquo;stderr&rdquo;, or a filename</li>
+<li><strong>robolectric.offline (new in 2.4)</strong> - set to &ldquo;true&rdquo; to disable runtime fetching of jars from Maven</li>
+<li><strong>robolectric.dependency.dir (new in 2.4)</strong> - when in offline mode, specifies a folder containing runtime dependencies such as the Android jar</li>
+</ul>
+
+<h2>Robolectric Config File</h2>
+
+<p>You can set default values for any item in the <a href="/javadoc/org/robolectric/annotation/Config.html">Config</a> object by including a special properties file on your classpath. The file must be named <code>org.robolectric.Config.properties</code> and should contain config values such as:</p>
+<pre class="highlight plaintext">manifest=../myapp/AndroidManifest.xml
+shadows=my.package.ShadowFoo
+</pre>
+<h2>project.properties File</h2>
+
+<p>If your project uses any ApkLibs, you will have to set these up to work correctly with Robolectric. This
+simply requires creating a <code>project.properties</code> file for your project that declares the dependencies to
+Robolectric.</p>
+
+<p>The <code>project.properties</code> file for your project should sit in the root of the project and looks something like this:</p>
+<pre class="highlight plaintext">target=android-&lt;android API level to target&gt;
+android.library.reference.1=&lt;relative path to first dependency&gt;
+android.library.reference.2=&lt;relative path to second dependency&gt;
+</pre>
+<p>Robolectric will look for and then parse this file to load dependencies before any tests run.</p>
+
+<h3>Note: multiple dependency locations</h3>
+
+<p>If you&rsquo;re working in an IDE such as IntelliJ and then pushing to a CI that uses Maven, you might run into
+the problem of a dependency appearing in different places depending on the environment - the IDE will probably compile to a different directory structure than Maven would. To deal with this, Robolectric will only attempt to load dependencies that exist at run time. This means you can just list both possible locations for the dependency like so:</p>
+<pre class="highlight plaintext">android.library.reference.1=dev-env-dir/my-awesome-dependency
+android.library.reference.2=ci-env-dir/my-awesome-dependency
+</pre>
+<p>In addition, you have the option to create a separate file called <code>test-project.properties</code>. If this file is present, Robolectric will use the values there instead.</p>
+
+        </div>
+    </div>
+
+    <div id="footer">
+        
+    </div>
+</body>
+</html>
